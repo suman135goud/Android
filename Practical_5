@@ -1,0 +1,434 @@
+-----------------------------AndroidManifest.xml----------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="practical1.com.ce.spce.myfragments">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+--------------------------------ActivityMain.xml----------------------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="1dp">
+
+        <fragment
+            android:id="@+id/topfragment"
+            android:name="practical1.com.ce.spce.myfragments.TopFragment"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:layout_weight="1"
+            />
+
+        <fragment
+            android:id="@+id/bottomfragment"
+            android:name="practical1.com.ce.spce.myfragments.Bottom"
+            android:layout_width="match_parent"
+            android:layout_height="50sp"
+            android:layout_weight="1"
+            />
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+----------------------------------------MainActivity.java--------------------------
+package practical1.com.ce.spce.myfragments;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+import android.widget.ArrayAdapter;
+import android.widget.Toast;
+
+public class MainActivity extends AppCompatActivity implements CallBackInterface{
+
+    ArrayAdapter<String> adapter;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+    }
+
+
+    @Override
+    public void onCallBack(String data) {
+        //Toast.makeText(this,data,Toast.LENGTH_LONG).show();
+
+        Bottom mybottom  = (Bottom)
+                getSupportFragmentManager().
+                        findFragmentById(R.id.bottomfragment);
+
+        mybottom.UpdateView(data);
+
+
+    }
+
+    @Override
+    public void ToastMe(String info) {
+        Toast.makeText(this,info,Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public ArrayAdapter<String> getAdapter() {
+        return this.adapter;
+    }
+
+    @Override
+    public void setAdapter(ArrayAdapter<String> adapter) {
+            this.adapter = adapter;
+    }
+
+
+}
+---------------------------------------------BlankFragment.xml---------------------------------------------------------------------------
+
+-<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".BlankFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/hello_blank_fragment" />
+
+    <Button
+        android:id="@+id/button"
+        android:onClick="clickMe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Button" />
+
+</FrameLayout>
+-------------------------------------------BlankFragment.java-----------------------------------------------------------------------
+package practical1.com.ce.spce.myfragments;
+
+
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Toast;
+
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class BlankFragment extends Fragment {
+
+
+    private CallBackInterface callBackListener;
+
+    public BlankFragment() {
+        // Required empty public constructor
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (getActivity() instanceof CallBackInterface)
+            callBackListener = (CallBackInterface) getActivity();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+
+        View v = inflater.inflate(R.layout.fragment_blank, container, false);
+
+        Button btn  = v.findViewById(R.id.button);
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                callBackListener.ToastMe("From Top");
+                callBackListener.onCallBack("Hello From Top");
+
+
+
+            }
+        });
+        return v;
+    }
+
+
+}
+------------------------------Fragment_Top.xml--------------------
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".TopFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <ListView
+        android:id="@+id/list"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent">
+    </ListView>
+
+</FrameLayout>
+--------------------------------------Fragment_Top.java-------------------------------
+package practical1.com.ce.spce.myfragments;
+
+
+import android.os.Bundle;
+
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.ListFragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.Toast;
+
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class TopFragment extends Fragment {
+
+    private String dataArray[];
+    private CallBackInterface callBackListener;
+    ArrayAdapter<String> adapter;
+
+    String[] items = {"India","USA","UK","Australia","Germany"};;
+
+    public TopFragment() {
+
+       // dataArray = new String[] { "One", "Two", "Three", };
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        //getActivity() is fully created in onActivityCreated and instanceOf differentiate it between different Activities
+        if (getActivity() instanceof CallBackInterface)
+            callBackListener = (CallBackInterface) getActivity();
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+
+       View view = inflater
+               .inflate(R.layout.fragment_top, container, false);
+
+
+       final ListView mylist  = view.findViewById(R.id.list);
+
+        adapter =
+               new ArrayAdapter<String>(
+                       getActivity(),
+                       android.R.layout.simple_list_item_1,
+                       items);
+
+       mylist.setAdapter(adapter);
+
+       mylist.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+           @Override
+           public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
+
+
+               Object o = adapterView.getItemAtPosition(position);
+
+
+               String str=(String)o;//As you are using Default String Adapter
+               //Toast.makeText(adapterView.getContext(),str,Toast.LENGTH_SHORT).show();
+               callBackListener.onCallBack(str);
+
+           }
+       });
+       //
+
+       //
+       return view;
+    }
+
+
+}
+-----------------------------------------Fragment_Bottom.xml------------------------------
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Bottom">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+
+            android:id="@+id/txtInfo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="" />
+
+        <ImageView
+            android:id="@+id/Image"
+            android:layout_width="324dp"
+            android:layout_height="169dp"
+            android:layout_marginStart="40dp"
+            android:layout_marginTop="48dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:src="@tools:sample/avatars[0]" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</FrameLayout>
+----------------------------------------------Fragment_Bottom.java-----------------------------------
+package practical1.com.ce.spce.myfragments;
+
+
+import android.os.Bundle;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class Bottom extends Fragment {
+
+    View view;
+    private CallBackInterface callBackListener;
+    ArrayAdapter<String> globals;
+
+    public Bottom() {
+        // Required empty public constructor
+    }
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+
+        if (getActivity() instanceof CallBackInterface)
+
+            callBackListener = (CallBackInterface) getActivity();
+
+
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
+        view = inflater.inflate(R.layout.fragment_bottom, container, false);
+
+                return view;
+    }
+
+    public void UpdateView(String data) {
+
+        TextView t = view.findViewById(R.id.txtInfo);
+       // t.setText(data);
+        if(data == "India"){
+            ImageView imageView = view.findViewById(R.id.Image);
+            imageView.setImageResource(R.drawable.india);
+        }
+        if(data == "USA"){
+            ImageView imageView = view.findViewById(R.id.Image);
+            imageView.setImageResource(R.drawable.usa);
+        }
+        if(data == "UK"){
+            ImageView imageView = view.findViewById(R.id.Image);
+            imageView.setImageResource(R.drawable.uk);
+        }
+        if(data == "Australia"){
+            ImageView imageView = view.findViewById(R.id.Image);
+            imageView.setImageResource(R.drawable.australia);
+        }
+        if(data == "Germany"){
+            ImageView imageView = view.findViewById(R.id.Image);
+            imageView.setImageResource(R.drawable.germany);
+        }
+        //callBackListener.ToastMe("From Bottom");
+
+
+    }
+}
+-----------------------------------------------CallBackInterface.java-------------------------------------------------------
+package practical1.com.ce.spce.myfragments;
+
+import android.widget.ArrayAdapter;
+
+public interface CallBackInterface {
+
+        void onCallBack(String data);// pass any parameter in your onCallBack which you want to return
+        void ToastMe(String data);
+
+
+        public ArrayAdapter<String> getAdapter();
+        void setAdapter(ArrayAdapter<String> adapter);
+}
